@@ -38,4 +38,4 @@ jobs:
             ./gradlew build --no-daemon
 
       - name: check build
-        run: ls ./build/lib
+        run: ls ./build/libs
