@@ -55,6 +55,7 @@ jobs:
         run: |
           cp ./build/libs/*.war ./Dockerfile
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/m-dev:tomcat_latest ./Dockerfile
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/m-dev:tomcat_${GITHUB_RUN_NUMBER} ./Dockerfile
           docker images
 
       - name: Login to Docker Hub
@@ -65,9 +66,6 @@ jobs:
           
       - name: docker push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/m-dev:tomcat_latest
-      
-      - name: re-name
-        run: mv ./build/libs/*.war ./build/libs/backup${GITHUB_SHA::7}.war
         
       - name: ls
         run: ls -al ./build/libs
@@ -90,8 +88,11 @@ jobs:
         uses: google-github-actions/auth@v0
         with:
          credentials_json: ${{ secrets.GCP_S3_KEY }}
-
-      - name: upload-folder
+         
+      - id: re-name
+        run: mv ./build/libs/*.war ./build/libs/backup${GITHUB_SHA::7}.war
+      
+      - name: upload-files
         uses: google-github-actions/upload-cloud-storage@v0
         with:
           path: ./build/libs/
